@@ -3,6 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import auth, telemetry
 from app.services.ai_engine import ai_model
 
+from app.database.session import engine, Base
+from app.database.models import User, TelemetryRecord
+
+# Crear tablas en la base de datos si no existen
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(title="Telemetry AI Service Pro", version="2.0")
 
 app.add_middleware(
