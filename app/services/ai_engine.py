@@ -79,8 +79,8 @@ class TelemetryAIModel:
             mad_delta = np.median(np.abs(past_deltas - median_delta), axis=0)
             std_delta = mad_delta * 1.4826
             
-            # Ajustamos aguaAnalogico (index 3) de 30.0 a 10.0 para que sea más sensible a las subidas
-            min_noise = np.array([0.5, 1.0, 10.0, 10.0, 0.2, 0.5, 5.0, 1.0, 1.0, 10.0, 5.0, 0.5])
+            # Ajustamos aguaAnalogico y suelo para que toleren ruido ADC
+            min_noise = np.array([0.5, 1.0, 10.0, 10.0, 0.2, 30.0, 5.0, 1.0, 1.0, 10.0, 5.0, 0.5])
             std_delta = np.maximum(std_delta, min_noise)
             
             z_scores = (current_delta - median_delta) / std_delta
