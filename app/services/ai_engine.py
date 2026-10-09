@@ -16,7 +16,7 @@ class TelemetryAIModel:
         self.model = None
         self.features = [
             "temperatura", "humedad", "tds", "aguaAnalogico",
-            "ph", "suelo", "turbidez", "caudal",
+            "ph", "oxigeno", "turbidez", "caudal",
             "presion", "aire", "sedimento", "temp_liquido"
         ]
         self._load_model()

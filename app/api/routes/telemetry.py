@@ -25,7 +25,7 @@ def push_telemetry(data: TelemetryData, db: Session = Depends(get_db)):
         "turbidez": getattr(last_record, 'turbidez', 0.0) if last_record else 0.0,
         "aguaAnalogico": getattr(last_record, 'aguaAnalogico', 0.0) if last_record else 0.0,
         "caudal": getattr(last_record, 'caudal', 0.0) if last_record else 0.0,
-        "suelo": getattr(last_record, 'suelo', 0.0) if last_record else 0.0,
+        "oxigeno": getattr(last_record, 'oxigeno', 0.0) if last_record else 0.0,
         "presion": getattr(last_record, 'presion', 0.0) if last_record else 0.0,
         "aire": getattr(last_record, 'aire', 0.0) if last_record else 0.0,
         "sedimento": getattr(last_record, 'sedimento', 0.0) if last_record else 0.0,
@@ -33,6 +33,10 @@ def push_telemetry(data: TelemetryData, db: Session = Depends(get_db)):
     }
     
     merged_data.update(provided_data)
+    
+    # Map frontend 'suelo' to backend 'oxigeno' column for legacy DB support
+    if 'suelo' in provided_data:
+        merged_data['oxigeno'] = provided_data.pop('suelo')
 
     if not ai_model.is_trained:
         ai_model.train("history.csv")
@@ -70,7 +74,7 @@ def get_latest_telemetry(db: Session = Depends(get_db)):
         "turbidez": record.turbidez,
         "aguaAnalogico": record.aguaAnalogico,
         "caudal": record.caudal,
-        "suelo": record.suelo,
+        "suelo": record.oxigeno,
         "presion": record.presion,
         "aire": record.aire,
         "sedimento": record.sedimento,
