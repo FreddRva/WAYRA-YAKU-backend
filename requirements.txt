@@ -11,4 +11,3 @@ passlib
 bcrypt
 pyjwt
 pydantic-settings
-httpx

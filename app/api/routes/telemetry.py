@@ -4,7 +4,6 @@ from app.database.session import get_db
 from app.database.models import TelemetryRecord
 from app.schemas.telemetry import TelemetryData
 from app.services.ai_engine import ai_model
-import httpx
 
 router = APIRouter(tags=["telemetry"])
 
