@@ -22,7 +22,7 @@ class TelemetryRecord(Base):
     turbidez = Column(Float, default=0.0)
     aguaAnalogico = Column(Float, default=0.0)
     caudal = Column(Float, default=0.0)
-    oxigeno = Column(Float, default=0.0)
+    suelo = Column(Float, default=0.0)
     presion = Column(Float, default=0.0)
     aire = Column(Float, default=0.0)
     sedimento = Column(Float, default=0.0)
