@@ -43,12 +43,27 @@ def push_telemetry(data: TelemetryData, db: Session = Depends(get_db)):
     
     return {"status": "success", "ai_result": resultado_ia}
 
-@router.get("/proxy/esp/{ip}")
-async def proxy_esp(ip: str):
-    # Ruta temporal por si se necesita leer directamente del ESP32 local
-    async with httpx.AsyncClient() as client:
-        try:
-            resp = await client.get(f"http://{ip}/sensor", timeout=2.0)
-            return resp.json()
-        except Exception:
-            return None
+@router.get("/api/telemetry/latest")
+def get_latest_telemetry(db: Session = Depends(get_db)):
+    record = db.query(TelemetryRecord).order_by(TelemetryRecord.timestamp.desc()).first()
+    if not record:
+        return {}
+    return {
+        "timestamp": record.timestamp.isoformat() if record.timestamp else None,
+        "temperatura": record.temperatura,
+        "humedad": record.humedad,
+        "ph": record.ph,
+        "tds": record.tds,
+        "turbidez": record.turbidez,
+        "aguaAnalogico": record.aguaAnalogico,
+        "caudal": record.caudal,
+        "oxigeno": record.oxigeno,
+        "presion": record.presion,
+        "aire": record.aire,
+        "sedimento": record.sedimento,
+        "temp_liquido": record.temp_liquido,
+        "is_anomaly": record.is_anomaly,
+        "anomaly_score": record.anomaly_score,
+        "status": record.status_label,
+        "anomalous_sensors": record.anomalous_sensors.split(",") if record.anomalous_sensors else []
+    }
