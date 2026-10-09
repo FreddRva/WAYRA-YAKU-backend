@@ -10,24 +10,37 @@ router = APIRouter(tags=["telemetry"])
 
 @router.post("/api/telemetry/push")
 def push_telemetry(data: TelemetryData, db: Session = Depends(get_db)):
+    # 1. Obtener el último registro para heredar los valores de los otros ESP32
+    last_record = db.query(TelemetryRecord).order_by(TelemetryRecord.timestamp.desc()).first()
+    
+    # 2. Obtener SOLO los datos que este ESP32 específico envió en su JSON
+    provided_data = data.model_dump(exclude_unset=True)
+    
+    # 3. Mezclar los datos: Tomamos lo último conocido y lo pisamos con lo nuevo
+    merged_data = {
+        "temperatura": getattr(last_record, 'temperatura', 0.0) if last_record else 0.0,
+        "humedad": getattr(last_record, 'humedad', 0.0) if last_record else 0.0,
+        "ph": getattr(last_record, 'ph', 0.0) if last_record else 0.0,
+        "tds": getattr(last_record, 'tds', 0.0) if last_record else 0.0,
+        "turbidez": getattr(last_record, 'turbidez', 0.0) if last_record else 0.0,
+        "aguaAnalogico": getattr(last_record, 'aguaAnalogico', 0.0) if last_record else 0.0,
+        "caudal": getattr(last_record, 'caudal', 0.0) if last_record else 0.0,
+        "oxigeno": getattr(last_record, 'oxigeno', 0.0) if last_record else 0.0,
+        "presion": getattr(last_record, 'presion', 0.0) if last_record else 0.0,
+        "aire": getattr(last_record, 'aire', 0.0) if last_record else 0.0,
+        "sedimento": getattr(last_record, 'sedimento', 0.0) if last_record else 0.0,
+        "temp_liquido": getattr(last_record, 'temp_liquido', 0.0) if last_record else 0.0,
+    }
+    
+    merged_data.update(provided_data)
+
     if not ai_model.is_trained:
         ai_model.train("history.csv")
         
-    resultado_ia = ai_model.predict_anomaly(data.model_dump())
+    resultado_ia = ai_model.predict_anomaly(merged_data)
     
     nuevo_registro = TelemetryRecord(
-        temperatura=data.temperatura,
-        humedad=data.humedad,
-        ph=data.ph,
-        tds=data.tds,
-        turbidez=data.turbidez,
-        aguaAnalogico=data.aguaAnalogico,
-        caudal=data.caudal,
-        oxigeno=data.oxigeno,
-        presion=data.presion,
-        aire=data.aire,
-        sedimento=data.sedimento,
-        temp_liquido=data.temp_liquido,
+        **merged_data,
         is_anomaly=resultado_ia["is_anomaly"],
         anomaly_score=resultado_ia["anomaly_score"],
         status_label=resultado_ia["status"],
