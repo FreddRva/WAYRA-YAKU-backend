@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+history.csv
+isolation_forest.joblib
+.pytest_cache/
