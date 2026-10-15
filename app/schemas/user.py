@@ -3,7 +3,7 @@ from pydantic import BaseModel
 class RegisterSchema(BaseModel):
     username: str
     password: str
-    role: str = "trabajador"
+    role: str = "mantenimiento"
 
 class LoginSchema(BaseModel):
     username: str
