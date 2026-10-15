@@ -79,3 +79,33 @@ def get_latest_telemetry(db: Session = Depends(get_db)):
         "status": record.status_label,
         "anomalous_sensors": record.anomalous_sensors.split(",") if record.anomalous_sensors else []
     }
+
+@router.get("/api/telemetry/history")
+def get_telemetry_history(limit: int = 50, db: Session = Depends(get_db)):
+    """Retorna los registros históricos recientes para inicializar los gráficos del frontend"""
+    records = db.query(TelemetryRecord).order_by(TelemetryRecord.timestamp.desc()).limit(limit).all()
+    if not records:
+        return []
+    
+    return [
+        {
+            "hora": r.timestamp.isoformat() if r.timestamp else None,
+            "temperatura": r.temperatura,
+            "humedad": r.humedad,
+            "ph": r.ph,
+            "tds": r.tds,
+            "turbidez": r.turbidez,
+            "aguaAnalogico": r.aguaAnalogico,
+            "caudal": r.caudal,
+            "volumen": 0.0,
+            "suelo": r.suelo,
+            "presion": r.presion,
+            "aire": r.aire,
+            "sedimento": r.sedimento,
+            "temp_liquido": r.temp_liquido,
+            "is_anomaly": r.is_anomaly,
+            "anomaly_score": r.anomaly_score,
+            "status": r.status_label
+        }
+        for r in reversed(records)
+    ]

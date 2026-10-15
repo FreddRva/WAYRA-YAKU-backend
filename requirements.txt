@@ -11,3 +11,6 @@ passlib
 bcrypt
 pyjwt
 pydantic-settings
+requests
+joblib
+
