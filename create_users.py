@@ -16,9 +16,12 @@ try:
     # 2. Mantenimiento
     mant = db.query(User).filter(User.username == "mantenimiento").first()
     if not mant:
-        mant = User(username="mantenimiento", password_hash=get_password_hash("mantenimiento123"), role="trabajador")
+        mant = User(username="mantenimiento", password_hash=get_password_hash("mantenimiento123"), role="mantenimiento")
         db.add(mant)
         print("Mantenimiento created")
+    else:
+        mant.role = "mantenimiento"
+        print("Mantenimiento updated to role=mantenimiento")
         
     db.commit()
     print("All users successfully inserted into Supabase!")
